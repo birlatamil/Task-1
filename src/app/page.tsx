@@ -1,7 +1,48 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import Image from "next/image";
+import { generateImage } from "@/ai/flows/generate-image-flow";
+import { cn } from "@/lib/utils";
 
 export default function Home() {
+  const [heroImage, setHeroImage] = useState("https://placehold.co/600x400.png");
+  const [landscapeImage, setLandscapeImage] = useState("https://placehold.co/800x450.png");
+  const [loadingHero, setLoadingHero] = useState(true);
+  const [loadingLandscape, setLoadingLandscape] = useState(true);
+
+  useEffect(() => {
+    const generateHeroImage = async () => {
+      try {
+        const result = await generateImage({ prompt: "abstract geometric" });
+        if (result.imageUrl) {
+          setHeroImage(result.imageUrl);
+        }
+      } catch (error) {
+        console.error("Failed to generate hero image:", error);
+      } finally {
+        setLoadingHero(false);
+      }
+    };
+
+    const generateLandscapeImage = async () => {
+        try {
+            const result = await generateImage({ prompt: "nature landscape" });
+            if (result.imageUrl) {
+                setLandscapeImage(result.imageUrl);
+            }
+        } catch (error) {
+            console.error("Failed to generate landscape image:", error);
+        } finally {
+            setLoadingLandscape(false);
+        }
+    }
+
+    generateHeroImage();
+    generateLandscapeImage();
+  }, []);
+
   return (
     <div className="flex flex-col">
       <section className="w-full pt-24 md:pt-32 lg:pt-40 pb-12 md:pb-24 lg:pb-32 bg-background">
@@ -17,14 +58,20 @@ export default function Home() {
                 </p>
               </div>
             </div>
-            <Image
-              src="https://placehold.co/600x400.png"
-              width="600"
-              height="400"
-              alt="Abstract design representing smooth navigation"
-              className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full"
-              data-ai-hint="abstract geometric"
-            />
+            <div className="relative">
+              {loadingHero && <div className="absolute inset-0 bg-secondary/50 animate-pulse rounded-xl" />}
+              <Image
+                src={heroImage}
+                width="600"
+                height="400"
+                alt="Abstract design representing smooth navigation"
+                className={cn(
+                  "mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full transition-opacity duration-500",
+                  loadingHero ? "opacity-50" : "opacity-100"
+                )}
+                data-ai-hint="abstract geometric"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -74,14 +121,20 @@ export default function Home() {
           <div className="max-w-4xl mx-auto text-left text-foreground/90 space-y-6 mt-8 text-lg leading-relaxed">
             <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</p>
             <p>Curabitur pretium tincidunt lacus. Nulla gravida orci a odio. Nullam varius, turpis et commodo pharetra, est eros bibendum elit, nec luctus magna felis sollicitudin mauris. Integer in mauris eu nibh euismod gravida. Duis ac tellus et risus vulputate vehicula. Donec lobortis risus a elit. Etiam tempor. Ut ullamcorper, ligula eu tempor congue, eros est euismod turpis, id tincidunt sapien risus a quam. Maecenas fermentum consequat mi. Donec fermentum. Pellentesque malesuada nulla a mi. Duis sapien sem, aliquet nec, commodo eget, consequat quis, neque. Aliquam faucibus, elit ut dictum aliquet, felis nisl adipiscing sapien, sed malesuada diam lacus eget erat. Cras mollis scelerisque nunc. Nullam arcu. Aliquam erat volutpat. Duis ac turpis. Integer rutrum ante eu lacus.</p>
-            <Image
-              src="https://placehold.co/800x450.png"
-              width="800"
-              height="450"
-              alt="Placeholder Image"
-              className="mx-auto aspect-video overflow-hidden rounded-xl object-cover"
-              data-ai-hint="nature landscape"
-            />
+            <div className="relative">
+              {loadingLandscape && <div className="absolute inset-0 bg-secondary/50 animate-pulse rounded-xl" />}
+              <Image
+                src={landscapeImage}
+                width="800"
+                height="450"
+                alt="Placeholder Image"
+                className={cn(
+                  "mx-auto aspect-video overflow-hidden rounded-xl object-cover transition-opacity duration-500",
+                  loadingLandscape ? "opacity-50" : "opacity-100"
+                )}
+                data-ai-hint="nature landscape"
+              />
+            </div>
             <p>Vestibulum libero nisl, porta vel, scelerisque eget, malesuada at, neque. Vivamus eget nibh. Etiam cursus leo vel metus. Nulla facilisi. Aenean nec eros. Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia Curae; Suspendisse sollicitudin velit sed leo. Ut pharetra augue nec augue. Nam elit agna, endrerit sit amet, tincidunt ac, viverra sed, nulla. Donec porta diam eu massa. Quisque diam lorem, interdum vitae, dapibus ac, scelerisque vitae, pede. Donec eget tellus non erat lacinia fermentum. Donec in velit vel ipsum auctor pulvinar. Proin ullamcorper urna et felis. Vestibulum iaculis lacinia est. Proin dictum elementum velit.</p>
             <p>Fusce euismod consequat ante. Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Pellentesque sed dolor. Aliquam congue fermentum nisl. Mauris accumsan nulla vel diam. Sed in lacus ut enim adipiscing aliquet. Nulla venenatis. In pede mi, aliquet sit amet, euismod in,auctor ut, ligula. Aliquam dapibus tincidunt metus. Praesent justo dolor, lobortis quis, lobortis dignissim, pulvinar ac, lorem. Vestibulum sed ante. Donec sagittis euismod purus. Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis et quasi architecto beatae vitae dicta sunt explicabo.</p>
           </div>
